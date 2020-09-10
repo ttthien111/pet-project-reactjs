@@ -4,12 +4,8 @@ import { Link, Switch, Route, BrowserRouter as Router } from 'react-router-dom'
 
 const CardExample = (props) => {
     const pImage = process.env.PUBLIC_URL + "/images/" + props.productImage
-    console.log(props);
     const category = props.categoryId === 1 ? 'food' : props.categoryId === 2 ? 'toys' : 'costume';
     const urlAPI = category + '/' + props.slugName;
-    console.log(urlAPI);
-    console.log(pImage);
-
     return (
         <Router>
             <MDBCol>

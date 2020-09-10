@@ -5,7 +5,6 @@ export default function AboutUs() {
     
     return (
         <MDBContainer>
-            
             <section className="my-5">
             <MDBCardTitle>
                 <h2 className="h1-responsive font-weight-bold text-center my-5">

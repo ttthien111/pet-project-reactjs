@@ -33,16 +33,3 @@ export function objectArrayToArray(obj, arr) {
         arr.push(obj[item]);
     }
 }
-
-//show DTO
-export function mapDataObjectToArray(arr) {
-    if (arr !== undefined) {
-        {
-            arr.map(arr => (
-                <li key={arr.categoryId}>
-                    {arr.categoryName} {arr.product}
-                </li>
-            ))
-        }
-    }
-}

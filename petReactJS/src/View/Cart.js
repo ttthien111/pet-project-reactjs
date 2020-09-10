@@ -1,11 +1,56 @@
-import React, { useState } from "react";
-import { MDBIcon, MDBRow, MDBCard, MDBCardBody, MDBTooltip, MDBTable, MDBTableBody, MDBTableHead, MDBInput, MDBBtn, MDBTableFoot, MDBContainer, MDBCardImage } from "mdbreact";
-
+import React, { useState, useEffect } from "react";
+import { MDBRow, MDBCard, MDBCardBody, MDBTooltip, MDBTable, MDBTableBody, MDBTableHead, MDBInput, MDBBtn, MDBContainer } from "mdbreact";
+import { AlertList } from 'react-bs-notifier';
 export default function Cart() {
-
-    const data2 = JSON.parse(localStorage.getItem('myBillDetail')) || []
-
-    const columns2 = [
+    const [position, setPosition] = React.useState("bottom-right");
+    const [alerts, setAlerts] = React.useState([]);
+    const [alertTimeout, setAlertTimeout] = React.useState(0);
+    const [newMessage, setNewMessage] = React.useState(
+        'Đơn hàng đã được tiếp nhận'
+    );
+    const data = JSON.parse(localStorage.getItem('myBillDetail')) || []
+    const [InputNumberUpdate, setInputNumberUpdate] = useState(data);
+    function getInputValue(value, index) {
+        console.log('value' + value);
+        console.log('index' + index);
+        let newArr = [...InputNumberUpdate];
+        console.log(newArr);
+        newArr[index].numberOrder = value;
+        setInputNumberUpdate(newArr);
+    }
+    function DeleteCurentItem(index) {
+        data.splice(index, 1);
+        console.log(data);
+        localStorage.setItem('myBillDetail', JSON.stringify(data));
+        window.location.reload();
+    }
+    function Purchase() {
+        generate('success');
+        setTimeout(() => localStorage.removeItem('myBillDetail'), 500);
+        setTimeout(() => window.location.replace('http://localhost:3000/products'), 2000);
+    }
+    const generate = React.useCallback(
+        type => {
+            setAlerts(alerts => [
+                ...alerts,
+                {
+                    id: new Date().getTime(),
+                    type: type,
+                    headline: `Whoa, ${type}!`,
+                    message: newMessage
+                }
+            ]);
+        },
+        [newMessage]
+    );
+    const onDismissed = React.useCallback(alert => {
+        setAlerts(alerts => {
+            const idx = alerts.indexOf(alert);
+            if (idx < 0) return alerts;
+            return [...alerts.slice(0, idx), ...alerts.slice(idx + 1)];
+        });
+    }, []);
+    const column = [
         {
             label: '',
             field: 'img',
@@ -36,18 +81,16 @@ export default function Cart() {
         }
     ]
     const rows = [];
-    const [Columns, setColumns] = useState(data2);
-    const [Data, setData] = useState(columns2)
+    const [Columns, setColumns] = useState(data);
+    const [Data, setData] = useState(column);
     let TotalBill = 0;
-    function Purchase() {
-        localStorage.removeItem('myBillDetail');
-        alert(`Đơn hàng đã được tiếp nhận\nNhấp OK để quay lại trang sản phẩm`);
-        setTimeout(() => window.location.replace('http://localhost:3000/products'), 1000);
-    }
-    data2.map(row => {
+
+
+    data.map((row, index) => {
         let category = row.pCategory === 1 ? 'Thực phẩm' : row.pCategory === 2 ? 'Đồ chơi' : 'Quần áo';
         let imgURL = process.env.PUBLIC_URL + "/images/" + row.pImage;
         TotalBill += row.numberOrder * row.pPrice;
+        console.log(InputNumberUpdate);
         return rows.push(
             {
                 'img': <img src={imgURL} style={{ width: '100px', height: '100px' }} alt="" className="img-fluid z-depth-0" />,
@@ -56,19 +99,19 @@ export default function Cart() {
                 'category': category,
                 'price': `${row.pPrice}`,
                 'qty':
-                    <MDBInput type="number" value={row.numberOrder} default={row.numberOrder} className="form-control" style={{ width: "100px" }} />,
-                'amount': <strong>{`${row.numberOrder * row.pPrice}`}</strong>,
+                    <>
+                        {/* <input min={'1'} type="number" style={{ textAlign: 'center', width: '100px' }} className="quantity" name="quantity" value={InputNumberUpdate} onChange={(e) => setNumberOfProduct(parseInt(e.target.value))} /> */}
+                        <input type="number" placeholder={row.numberOrder} value={InputNumberUpdate.numberOrder} style={{ width: "100px" }} onChange={(e) => getInputValue(parseInt(e.target.value), index)} />
+                    </>,
+                'amount':
+                    <>
+                        <strong>{`${row.numberOrder * row.pPrice}`}</strong>
+                    </>,
                 'buttonRefresh':
                     <>
                         <i className="fas fa-camera fa-xs"></i>
                         <MDBTooltip placement="top">
-                            <MDBBtn color="primary" size="m">
-                                ?
-                            </MDBBtn>
-                            <div>Cập nhật số lượng</div>
-                        </MDBTooltip>
-                        <MDBTooltip placement="top">
-                            <MDBBtn color="primary" size="m">
+                            <MDBBtn onClick={() => DeleteCurentItem(index)} color="primary" size="m">
                                 X
                         </MDBBtn>
                             <div>Xóa sản phẩm</div>
@@ -95,26 +138,33 @@ export default function Cart() {
             </MDBTooltip>
     })
 
-    if(data2.length!==0)
+    if (data.length !== 0)
         return (
             <MDBContainer>
                 <MDBRow className="my-2" center>
                     <MDBCard className="w-100">
                         <MDBCardBody>
                             <MDBTable className="product-table">
-                                <MDBTableHead className="font-weight-bold" color="mdb-color lighten-5" columns={columns2} />
+                                <MDBTableHead className="font-weight-bold" color="mdb-color lighten-5" columns={column} />
                                 <MDBTableBody rows={rows} />
                                 <MDBTableBody rows={rowsTemp} />
                             </MDBTable>
                         </MDBCardBody>
                     </MDBCard>
                 </MDBRow>
+                <AlertList
+                    position={position}
+                    alerts={alerts}
+                    timeout={alertTimeout}
+                    dismissTitle="Begone!"
+                    onDismiss={onDismissed}
+                />
             </MDBContainer>
         )
     else
         return (
             <MDBContainer>
-                <img style={{width:'100%',height:'600px'}} class="center" src="https://i.pinimg.com/originals/2e/ac/fa/2eacfa305d7715bdcd86bb4956209038.png"/>
+                <img style={{ width: '100%', height: '600px' }} class="center" src="https://i.pinimg.com/originals/2e/ac/fa/2eacfa305d7715bdcd86bb4956209038.png" />
             </MDBContainer>
         )
 }
