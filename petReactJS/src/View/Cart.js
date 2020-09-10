@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MDBRow, MDBCard, MDBCardBody, MDBTooltip, MDBTable, MDBTableBody, MDBTableHead, MDBInput, MDBBtn, MDBContainer } from "mdbreact";
 import { AlertList } from 'react-bs-notifier';
+import * as constant from '../Helper/constant'
 export default function Cart() {
+    const [LoginInformation, setLoginInformation] = useState(localStorage.getItem(constant.LOGIN_INFORMATION));
     const [position, setPosition] = React.useState("bottom-right");
     const [alerts, setAlerts] = React.useState([]);
-    const [alertTimeout, setAlertTimeout] = React.useState(0);
+    const [alertTimeout, setAlertTimeout] = React.useState(1);
     const [newMessage, setNewMessage] = React.useState(
-        'Đơn hàng đã được tiếp nhận'
+        null
     );
-    const data = JSON.parse(localStorage.getItem('myBillDetail')) || []
+    const didMountRef = useRef(false);
+    const data = JSON.parse(localStorage.getItem(constant.BILL_DETAIL)) || []
     const [InputNumberUpdate, setInputNumberUpdate] = useState(data);
     function getInputValue(value, index) {
         console.log('value' + value);
@@ -21,14 +24,28 @@ export default function Cart() {
     function DeleteCurentItem(index) {
         data.splice(index, 1);
         console.log(data);
-        localStorage.setItem('myBillDetail', JSON.stringify(data));
+        localStorage.setItem(constant.BILL_DETAIL, JSON.stringify(data));
         window.location.reload();
     }
     function Purchase() {
-        generate('success');
-        setTimeout(() => localStorage.removeItem('myBillDetail'), 500);
-        setTimeout(() => window.location.replace('http://localhost:3000/products'), 2000);
+        if (LoginInformation !== null) {
+            setNewMessage('Đơn hàng đã được tiếp nhận');
+            generate('success');
+            setTimeout(() => localStorage.removeItem(constant.BILL_DETAIL), 500);
+            setTimeout(() => window.location.replace('http://localhost:3000/products'), 2000);
+        }
+        else{
+            setNewMessage('Vui lòng đăng nhập để mua hàng');
+            generate('danger');
+        }
+        
     }
+    useEffect(() => {
+        if(didMountRef.current)
+            Purchase();
+        else
+            didMountRef.current = true;
+    }, [newMessage]);
     const generate = React.useCallback(
         type => {
             setAlerts(alerts => [
@@ -36,8 +53,8 @@ export default function Cart() {
                 {
                     id: new Date().getTime(),
                     type: type,
-                    headline: `Whoa, ${type}!`,
-                    message: newMessage
+                    message: newMessage,
+                    headline: `Thông báo!`
                 }
             ]);
         },
@@ -52,7 +69,7 @@ export default function Cart() {
     }, []);
     const column = [
         {
-            label: '',
+            label: <strong>Hình ảnh</strong>,
             field: 'img',
         },
         {
@@ -89,8 +106,8 @@ export default function Cart() {
     data.map((row, index) => {
         let category = row.pCategory === 1 ? 'Thực phẩm' : row.pCategory === 2 ? 'Đồ chơi' : 'Quần áo';
         let imgURL = process.env.PUBLIC_URL + "/images/" + row.pImage;
-        TotalBill += row.numberOrder * row.pPrice;
-        console.log(InputNumberUpdate);
+        TotalBill += InputNumberUpdate[index].numberOrder * row.pPrice;
+        console.log(InputNumberUpdate[index].numberOrder);
         return rows.push(
             {
                 'img': <img src={imgURL} style={{ width: '100px', height: '100px' }} alt="" className="img-fluid z-depth-0" />,
@@ -101,11 +118,13 @@ export default function Cart() {
                 'qty':
                     <>
                         {/* <input min={'1'} type="number" style={{ textAlign: 'center', width: '100px' }} className="quantity" name="quantity" value={InputNumberUpdate} onChange={(e) => setNumberOfProduct(parseInt(e.target.value))} /> */}
-                        <input type="number" placeholder={row.numberOrder} value={InputNumberUpdate.numberOrder} style={{ width: "100px" }} onChange={(e) => getInputValue(parseInt(e.target.value), index)} />
+                        <input min={'1'} type="number" placeholder={row.numberOrder} value={InputNumberUpdate.numberOrder} style={{ width: "100px" }} onChange={(e) => getInputValue(parseInt(e.target.value), index)} />
                     </>,
                 'amount':
                     <>
-                        <strong>{`${row.numberOrder * row.pPrice}`}</strong>
+                        {/* <strong>{`${row.numberOrder * row.pPrice}`}</strong> */}
+                        <strong>{InputNumberUpdate[index].numberOrder * row.pPrice}</strong>
+
                     </>,
                 'buttonRefresh':
                     <>

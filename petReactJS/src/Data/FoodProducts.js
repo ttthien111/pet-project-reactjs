@@ -11,7 +11,6 @@ export default function FoodData() {
     let arr = [];
     commonFunc.objectArrayToArray(FoodData, arr);
     if (FoodData !== undefined) {
-        console.log(arr[0]);
         return (
             <>
                 <ul>

@@ -82,7 +82,7 @@ export default function DashBoard() {
                                     do eiusmod tempor incididunt ut labore et dolore magna
                                     aliqua. Ut enim ad minim veniam.
               </p>
-                                <MDBBtn color="pink" size="sm">
+                                <MDBBtn color="btn btn-success" size="sm">
                                     Learn more
               </MDBBtn>
                             </MDBCol>
@@ -100,7 +100,7 @@ export default function DashBoard() {
                                     do eiusmod tempor incididunt ut labore et dolore magna
                                     aliqua. Ut enim ad minim veniam.
               </p>
-                                <MDBBtn color="purple" size="sm">
+                                <MDBBtn color="btn btn-info" size="sm">
                                     Learn more
               </MDBBtn>
                             </MDBCol>
@@ -113,7 +113,7 @@ export default function DashBoard() {
                 <MDBView src='https://mdbootstrap.com/img/Photos/Others/img%20%2848%29.jpg'>
                     <br></br>
                     <h2 style={{ color: 'white' }} className="h1-responsive font-weight-bold my-5">
-                        Our best projects
+                        Our best products
                 </h2>
 
                     <MDBRow className="text-center">

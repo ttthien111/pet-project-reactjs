@@ -1,11 +1,18 @@
-
 import React from "react";
 import { MDBCol, MDBContainer, MDBRow, MDBFooter } from "mdbreact";
-import "./Footer.css"
 
 function Footer() {
+  const mainFooterStyle = {
+    marginTop: '50px',
+    color: 'white',
+    backgroundColor: 'black',
+    paddingTop: '3em',
+    position: 'relative',
+    bottom: '0',
+    width: '100%'
+  };
   return (
-    <div className="main-footer">
+    <div style={mainFooterStyle}>
       <div className="container">
         <MDBFooter color="blue" className="font-small pt-4 mt-4">
           <MDBContainer className="text-center text-md-left">

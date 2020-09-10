@@ -16,7 +16,6 @@ const CardExample = (props) => {
                         <MDBCardText>
                             {props.productDescription}
                         </MDBCardText>
-                        {/* <Link to={{ pathname: `/detail/${props.slugName}` }}>Mua ngay</Link> */}
                         <Link to={`/products/${category}/${props.slugName}`} onClick={()=>{window.location.replace(`http://localhost:3000/products/${category}/${props.slugName}`)}}>Xem chi tiết</Link>
                     </MDBCardBody>
                 </MDBCard>
